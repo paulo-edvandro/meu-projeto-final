@@ -1,7 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // CONFIG SUPABASE
@@ -10,14 +12,14 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2eGpsb3l1bWJkaGJremJjcHF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzkwODQsImV4cCI6MjA3OTc1NTA4NH0.I8rPduAf7GiUHZ_NnTRwth1Lj-gkeBDNguly9ktYSJs"
 );
 
-// LISTAR TODOS OS PRODUTOS
+// LISTAR TODOS
 app.get("/produtos", async (req, res) => {
   const { data, error } = await supabase.from("produtos").select("*");
   if (error) return res.status(400).json(error);
   res.json(data);
 });
 
-// LISTAR PRODUTOS POR ID
+// LISTAR POR ID
 app.get("/produtos/:id", async (req, res) => {
   const { data, error } = await supabase
     .from("produtos")
@@ -28,35 +30,39 @@ app.get("/produtos/:id", async (req, res) => {
   res.json(data);
 });
 
-// CRIAR UM PRODUTO
+// CRIAR PRODUTO
 app.post("/produtos", async (req, res) => {
   const { nome, descricao, preco } = req.body;
+
   const { data, error } = await supabase
     .from("produtos")
     .insert([{ nome, descricao, preco }]);
+
   if (error) return res.status(400).json(error);
   res.json(data);
 });
 
-// ATUALIZAR UM PRODUTO
+// ATUALIZAR
 app.put("/produtos/:id", async (req, res) => {
   const { nome, descricao, preco } = req.body;
+
   const { data, error } = await supabase
     .from("produtos")
     .update({ nome, descricao, preco })
     .eq("id", req.params.id);
+
   if (error) return res.status(400).json(error);
   res.json(data);
 });
 
-// DELETAR UM PRODUTO
+// DELETAR
 app.delete("/produtos/:id", async (req, res) => {
   const { error } = await supabase
     .from("produtos")
     .delete()
     .eq("id", req.params.id);
-  if (error) return res.status(400).json(error);
 
+  if (error) return res.status(400).json(error);
   res.json({ message: "Deletado com sucesso" });
 });
 
